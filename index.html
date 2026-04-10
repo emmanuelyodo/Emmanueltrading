@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <meta name="description" content="Emmanuel Trading — La plateforme d'éducation Forex pensée pour l'Afrique. Formations, analyses de marché, coaching individuel et communauté premium.">
+  <meta name="theme-color" content="#0D2137">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="Emmanuel Trading">
+
+  <title>Emmanuel Trading — On ne promet pas la fortune. On construit des traders.</title>
+
+  <!-- CSS (non-blocking) -->
+  <link rel="stylesheet" href="css/main.css">
+  <link rel="stylesheet" href="css/components.css">
+  <link rel="stylesheet" href="css/screens.css">
+
+  <!-- Open Graph -->
+  <meta property="og:title" content="Emmanuel Trading">
+  <meta property="og:description" content="Formation Forex sérieuse pour l'Afrique de l'Ouest">
+  <meta property="og:type" content="website">
+</head>
+<body>
+
+<!-- Toast Notifications -->
+<div class="toast-container" id="toast-container"></div>
+
+<!-- Payment Modal Overlay -->
+<div class="modal-overlay" id="payment-modal" onclick="if(event.target===this)ET.Screens.payments.closeModal()"></div>
+
+<!-- App Shell -->
+<div id="app">
+
+  <!-- SCREEN 1: SPLASH -->
+  <div class="screen" id="screen-splash"></div>
+
+  <!-- SCREEN 2: ONBOARDING -->
+  <div class="screen" id="screen-onboarding"></div>
+
+  <!-- SCREEN 3: AUTH -->
+  <div class="screen" id="screen-auth"></div>
+
+  <!-- SCREEN 4: DASHBOARD -->
+  <div class="screen" id="screen-dashboard"></div>
+
+  <!-- SCREEN 5: FORMATIONS -->
+  <div class="screen" id="screen-formations"></div>
+
+  <!-- SCREEN 6: COMMUNITY -->
+  <div class="screen" id="screen-community"></div>
+
+  <!-- SCREEN 7: ANALYSES -->
+  <div class="screen" id="screen-analyses"></div>
+
+  <!-- SCREEN 8: COACHING -->
+  <div class="screen" id="screen-coaching"></div>
+
+  <!-- SCREEN 9: PAYMENTS -->
+  <div class="screen" id="screen-payments"></div>
+
+  <!-- SCREEN 10: PROFILE -->
+  <div class="screen" id="screen-profile"></div>
+
+  <!-- SCREEN 11: NOTIFICATIONS -->
+  <div class="screen" id="screen-notifications"></div>
+
+  <!-- SCREEN 12: ABOUT -->
+  <div class="screen" id="screen-about"></div>
+
+  <!-- Bottom Navigation -->
+  <nav class="bottom-nav" id="bottom-nav"></nav>
+
+</div>
+
+<!--
+  Scripts: loaded in order with defer so DOMContentLoaded fires
+  after ALL scripts are parsed and executed.
+  Order matters: data → auth → market → app → screens
+-->
+<script src="js/data.js"></script>
+<script src="js/auth.js"></script>
+<script src="js/market.js"></script>
+<script src="js/app.js"></script>
+<script src="js/screens/screen1-3.js"></script>
+<script src="js/screens/screen4-5.js"></script>
+<script src="js/screens/screen6-7.js"></script>
+<script src="js/screens/screen8-9.js"></script>
+<script src="js/screens/screen10-12.js"></script>
+
+</body>
+</html>

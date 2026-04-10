@@ -1,0 +1,19 @@
+# Dependencies
+node_modules/
+dist/
+build/
+
+# IDEs/Config
+.vscode/
+.idea/
+*.swp
+*.log
+
+# PWA / Temp
+.gemini/
+.env
+
+# MacOS/Windows
+.DS_Store
+Thumbs.db
+desktop.ini

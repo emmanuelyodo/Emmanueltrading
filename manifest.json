@@ -1,0 +1,19 @@
+{
+  "name": "Emmanuel Trading",
+  "short_name": "ET Trading",
+  "description": "La plateforme d'éducation Forex pensée pour l'Afrique de l'Ouest.",
+  "start_url": "./index.html",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#0D2137",
+  "theme_color": "#0D2137",
+  "lang": "fr",
+  "categories": ["education", "finance"],
+  "icons": [
+    { "src": "assets/icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any maskable" },
+    { "src": "assets/icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any maskable" }
+  ],
+  "screenshots": [],
+  "related_applications": [],
+  "prefer_related_applications": false
+}

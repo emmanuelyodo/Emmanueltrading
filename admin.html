@@ -1,0 +1,659 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Emmanuel Trading — Back-office Admin</title>
+  <link rel="stylesheet" href="css/main.css">
+  <link rel="stylesheet" href="css/components.css">
+  <link rel="stylesheet" href="css/screens.css">
+  <style>
+    body {
+      max-width: none;
+      overflow: auto;
+      height: auto;
+      min-height: 100vh;
+      background: var(--bg-light);
+    }
+    .admin-sidebar {
+      width: 230px;
+      background: var(--blue-dark);
+      height: 100vh;
+      position: fixed;
+      left: 0; top: 0;
+      display: flex;
+      flex-direction: column;
+      padding: 24px 0;
+      z-index: 100;
+    }
+    .admin-logo {
+      padding: 0 24px 24px;
+      border-bottom: 1px solid rgba(255,255,255,.08);
+      margin-bottom: 16px;
+    }
+    .admin-logo-title {
+      font-family: 'Outfit', sans-serif;
+      font-size: 18px;
+      font-weight: 800;
+      color: #fff;
+    }
+    .admin-logo-title span { color: #D4A017; }
+    .admin-logo-sub { font-size: 11px; color: rgba(255,255,255,.4); margin-top: 2px; }
+    .sidebar-link {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 12px 24px;
+      color: rgba(255,255,255,.6);
+      font-size: 14px;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.15s ease;
+      border-left: 3px solid transparent;
+    }
+    .sidebar-link:hover { color: #fff; background: rgba(255,255,255,.05); }
+    .sidebar-link.active { color: #D4A017; border-left-color: #D4A017; background: rgba(212,160,23,.08); }
+    .admin-main {
+      margin-left: 230px;
+      padding: 0;
+      min-height: 100vh;
+    }
+    .admin-topbar {
+      background: var(--bg-card);
+      border-bottom: 1px solid var(--border);
+      padding: 16px 24px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      position: sticky;
+      top: 0;
+      z-index: 50;
+    }
+    .admin-page { padding: 24px; display: none; }
+    .admin-page.active { display: block; }
+    .admin-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 14px;
+    }
+    .admin-table th {
+      background: var(--bg-light);
+      padding: 12px 16px;
+      text-align: left;
+      font-size: 11px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: .5px;
+      color: var(--text-muted);
+      border-bottom: 1px solid var(--border);
+    }
+    .admin-table td {
+      padding: 14px 16px;
+      border-bottom: 1px solid var(--border);
+      color: var(--text-secondary);
+    }
+    .admin-table tr:hover td { background: rgba(13,33,55,.03); }
+    .chart-bar-wrap {
+      height: 200px;
+      display: flex;
+      align-items: flex-end;
+      gap: 8px;
+      padding: 0 8px;
+    }
+    .chart-bar {
+      flex: 1;
+      border-radius: 4px 4px 0 0;
+      position: relative;
+      cursor: pointer;
+      transition: opacity 0.15s;
+    }
+    .chart-bar:hover { opacity: 0.8; }
+    .chart-bar-label {
+      position: absolute;
+      bottom: -20px;
+      width: 100%;
+      text-align: center;
+      font-size: 10px;
+      color: var(--text-muted);
+    }
+    .mini-stat {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 20px;
+      position: relative;
+      overflow: hidden;
+    }
+    .mini-stat::after {
+      content: '';
+      position: absolute;
+      bottom: -20px; right: -20px;
+      width: 80px; height: 80px;
+      border-radius: 50%;
+      background: var(--accent-bg, rgba(26,74,122,.06));
+    }
+  </style>
+</head>
+<body>
+
+<!-- Sidebar -->
+<div class="admin-sidebar">
+  <div class="admin-logo">
+    <div class="admin-logo-title">Emmanuel <span>Trading</span></div>
+    <div class="admin-logo-sub">Back-office Admin v1.0</div>
+  </div>
+
+  <div style="padding: 0 12px; margin-bottom: 8px;">
+    <div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.6px;color:rgba(255,255,255,.3);padding:0 12px">Menu principal</div>
+  </div>
+
+  <div class="sidebar-link active" onclick="showPage('dashboard')">
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
+    Tableau de bord
+  </div>
+  <div class="sidebar-link" onclick="showPage('users')">
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+    Utilisateurs
+  </div>
+  <div class="sidebar-link" onclick="showPage('formations')">
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg>
+    Formations
+  </div>
+  <div class="sidebar-link" onclick="showPage('analyses')">
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/><line x1="2" y1="20" x2="22" y2="20"/></svg>
+    Analyses
+  </div>
+  <div class="sidebar-link" onclick="showPage('payments')">
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="1" y="4" width="22" height="16" rx="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg>
+    Paiements
+  </div>
+  <div class="sidebar-link" onclick="showPage('notifications-admin')">
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
+    Notifications push
+  </div>
+
+  <div style="margin-top: auto; padding: 24px 12px 0; border-top: 1px solid rgba(255,255,255,.08)">
+    <a href="index.html" style="display:flex;align-items:center;gap:12px;padding:12px;color:rgba(255,255,255,.5);font-size:13px;text-decoration:none">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+      Voir l'app mobile
+    </a>
+  </div>
+</div>
+
+<!-- Main Content -->
+<div class="admin-main">
+
+  <!-- Topbar -->
+  <div class="admin-topbar">
+    <div>
+      <div style="font-family:'Outfit',sans-serif;font-weight:800;font-size:18px;color:var(--text-primary)" id="page-title">Tableau de bord</div>
+      <div style="font-size:12px;color:var(--text-muted)" id="page-subtitle">Vue d'ensemble des activités</div>
+    </div>
+    <div style="display:flex;align-items:center;gap:12px">
+      <div style="font-size:13px;color:var(--text-muted)" id="admin-time"></div>
+      <div style="display:flex;align-items:center;gap:8px;background:var(--bg-light);border:1px solid var(--border);border-radius:8px;padding:8px 12px">
+        <div style="width:28px;height:28px;border-radius:50%;background:linear-gradient(135deg,#D4A017,#A87A0F);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:800;color:#0D2137">E</div>
+        <div>
+          <div style="font-size:13px;font-weight:700">Emmanuel</div>
+          <div style="font-size:10px;color:var(--text-muted)">Super Admin</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- PAGE: Dashboard -->
+  <div class="admin-page active" id="page-dashboard">
+    <div style="margin-bottom:24px">
+      <h2 style="font-size:14px;font-weight:700;color:var(--text-muted);text-transform:uppercase;letter-spacing:.5px;margin-bottom:16px">KPIs clés</h2>
+      <div class="admin-kpi-grid">
+        <div class="admin-kpi" style="--accent-bg:rgba(26,74,122,.06)">
+          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px">
+            <span style="font-size:12px;font-weight:700;color:var(--text-muted);text-transform:uppercase">Inscrits total</span>
+            <div style="width:32px;height:32px;background:rgba(26,74,122,.1);border-radius:8px;display:flex;align-items:center;justify-content:center">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#1A4A7A" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+            </div>
+          </div>
+          <div class="admin-kpi-value">2 847</div>
+          <div class="admin-kpi-label">Utilisateurs inscrits</div>
+          <div class="admin-kpi-change up">↑ +127 cette semaine</div>
+        </div>
+        <div class="admin-kpi">
+          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px">
+            <span style="font-size:12px;font-weight:700;color:var(--text-muted);text-transform:uppercase">Actifs / mois</span>
+            <div style="width:32px;height:32px;background:rgba(26,122,74,.1);border-radius:8px;display:flex;align-items:center;justify-content:center">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#1A7A4A" stroke-width="2"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/><polyline points="17 6 23 6 23 12"/></svg>
+            </div>
+          </div>
+          <div class="admin-kpi-value" style="color:var(--green)">1 204</div>
+          <div class="admin-kpi-label">Utilisateurs actifs (30 j.)</div>
+          <div class="admin-kpi-change up">↑ +8.3% vs mois dernier</div>
+        </div>
+        <div class="admin-kpi">
+          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px">
+            <span style="font-size:12px;font-weight:700;color:var(--text-muted);text-transform:uppercase">Revenus ce mois</span>
+            <div style="width:32px;height:32px;background:rgba(212,160,23,.12);border-radius:8px;display:flex;align-items:center;justify-content:center">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#D4A017" stroke-width="2"><rect x="1" y="4" width="22" height="16" rx="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg>
+            </div>
+          </div>
+          <div class="admin-kpi-value" style="color:var(--gold)">1.84M</div>
+          <div class="admin-kpi-label">FCFA — Avril 2026</div>
+          <div class="admin-kpi-change up">↑ +23% vs mars</div>
+        </div>
+        <div class="admin-kpi">
+          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px">
+            <span style="font-size:12px;font-weight:700;color:var(--text-muted);text-transform:uppercase">Taux conversion</span>
+            <div style="width:32px;height:32px;background:rgba(192,57,43,.1);border-radius:8px;display:flex;align-items:center;justify-content:center">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#C0392B" stroke-width="2"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/></svg>
+            </div>
+          </div>
+          <div class="admin-kpi-value" style="color:var(--blue-mid)">18.4%</div>
+          <div class="admin-kpi-label">Gratuit → Payant</div>
+          <div class="admin-kpi-change up">↑ +2.1 pts</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Revenue Chart -->
+    <div style="display:grid;grid-template-columns:2fr 1fr;gap:24px;margin-bottom:24px">
+      <div class="card">
+        <div class="card-header">
+          <span style="font-weight:800">Revenus mensuels (FCFA)</span>
+          <select style="font-size:12px;border:1px solid var(--border);border-radius:6px;padding:4px 8px;background:var(--bg-light);color:var(--text-secondary)">
+            <option>2026</option><option>2025</option>
+          </select>
+        </div>
+        <div class="card-body">
+          <div class="chart-bar-wrap" id="revenue-chart">
+            <!-- Generated by JS -->
+          </div>
+          <div style="padding-top:28px;display:flex;gap:24px;font-size:12px;color:var(--text-muted)">
+            <div><span style="color:var(--blue-mid);font-weight:700">■</span> Formations</div>
+            <div><span style="color:var(--gold);font-weight:700">■</span> Premium</div>
+            <div><span style="color:var(--green);font-weight:700">■</span> Coaching</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-header"><span style="font-weight:800">Répartition des revenus</span></div>
+        <div class="card-body">
+          <div style="position:relative;width:160px;height:160px;margin:0 auto 16px">
+            <svg width="160" height="160" viewBox="0 0 160 160">
+              <!-- Donut chart segments (simplified) -->
+              <circle cx="80" cy="80" r="60" fill="none" stroke="#E2E8F0" stroke-width="20"/>
+              <circle cx="80" cy="80" r="60" fill="none" stroke="#1A4A7A" stroke-width="20" stroke-dasharray="226 150" stroke-dashoffset="0" transform="rotate(-90 80 80)"/>
+              <circle cx="80" cy="80" r="60" fill="none" stroke="#D4A017" stroke-width="20" stroke-dasharray="113 263" stroke-dashoffset="-226" transform="rotate(-90 80 80)"/>
+              <circle cx="80" cy="80" r="60" fill="none" stroke="#1A7A4A" stroke-width="20" stroke-dasharray="37 339" stroke-dashoffset="-339" transform="rotate(-90 80 80)"/>
+            </svg>
+            <div style="position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center">
+              <div style="font-size:18px;font-weight:800;color:var(--text-primary)">1.84M</div>
+              <div style="font-size:10px;color:var(--text-muted)">FCFA</div>
+            </div>
+          </div>
+          ${[
+            { label:'Formations', value:'59%', color:'#1A4A7){s.color}"></div>
+                <span style="color:var(--text-secondary)">${s.label}</span>
+              </div>
+              <div style="text-align:right">
+                <div style="font-weight:700">${s.value}</div>
+                <div style="font-size:11px;color:var(--text-muted)">${s.amount}</div>
+              </div>
+            </div>
+          `).join('')}
+        </div>
+      </div>
+    </div>
+
+    <!-- Recent Users -->
+    <div class="card">
+      <div class="card-header">
+        <span style="font-weight:800">Dernières inscriptions</span>
+        <button class="btn-ghost btn-sm btn" onclick="showPage('users')">Voir tous →</button>
+      </div>
+      <div style="overflow-x:auto">
+        <table class="admin-table">
+          <thead>
+            <tr>
+              <th>Utilisateur</th>
+              <th>Pays</th>
+              <th>Plan</th>
+              <th>Inscrit le</th>
+              <th>Statut</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody id="recent-users-table">
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- PAGE: Users -->
+  <div class="admin-page" id="page-users">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:20px">
+      <div style="display:flex;gap:12px;align-items:center">
+        <input type="text" placeholder="Rechercher un utilisateur…" style="padding:10px 14px;border:1px solid var(--border);border-radius:8px;font-size:14px;width:280px;background:var(--bg-card);color:var(--text-primary)">
+        <select style="padding:10px 14px;border:1px solid var(--border);border-radius:8px;font-size:14px;background:var(--bg-card);color:var(--text-secondary)">
+          <option>Tous les plans</option>
+          <option>Essentiel</option>
+          <option>Premium</option>
+          <option>Élite</option>
+        </select>
+      </div>
+      <button class="btn btn-primary btn-sm" onclick="alert('Export CSV généré')">⬇ Export CSV</button>
+    </div>
+    <div class="card">
+      <div style="overflow-x:auto">
+        <table class="admin-table">
+          <thead>
+            <tr>
+              <th>Nom</th>
+              <th>Email</th>
+              <th>Pays</th>
+              <th>Plan</th>
+              <th>Inscrit le</th>
+              <th>Dernière co.</th>
+              <th>Statut</th>
+              <th style="text-align:right">Actions</th>
+            </tr>
+          </thead>
+          <tbody id="all-users-table"></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- PAGE: Formations -->
+  <div class="admin-page" id="page-formations">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:20px">
+      <div></div>
+      <button class="btn btn-primary btn-sm" onclick="alert('Création de formation — disponible en production')">+ Nouvelle formation</button>
+    </div>
+    <div class="card">
+      <div style="overflow-x:auto">
+        <table class="admin-table">
+          <thead>
+            <tr><th>Formation</th><th>Niveau</th><th>Prix</th><th>Inscrits</th><th>Statut</th><th>Actions</th></tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><strong>Forex de A à Z</strong></td>
+              <td><span class="badge level-debutant">Débutant</span></td>
+              <td><strong>30 000 FCFA</strong></td>
+              <td><strong>247</strong></td>
+              <td><span class="badge badge-green">Publié</span></td>
+              <td>
+                <button class="btn btn-sm btn-secondary" onclick="alert('Édition formation')">Éditer</button>
+                <button class="btn btn-sm btn-ghost" onclick="alert('Dépublication')">Dépublier</button>
+              </td>
+            </tr>
+            <tr>
+              <td><strong>Trading Avancé</strong></td>
+              <td><span class="badge level-intermediaire">Intermédiaire</span></td>
+              <td><span style="color:var(--text-muted)">N/A</span></td>
+              <td><strong>0</strong></td>
+              <td><span class="badge badge-muted">En création</span></td>
+              <td>
+                <button class="btn btn-sm btn-secondary" onclick="alert('Édition formation')">Éditer</button>
+                <button class="btn btn-sm btn-primary" onclick="alert('Publication')">Publier</button>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- PAGE: Analyses -->
+  <div class="admin-page" id="page-analyses">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:20px">
+      <div></div>
+      <button class="btn btn-primary btn-sm" onclick="alert('Création d\'analyse — disponible en production')">+ Nouvelle analyse</button>
+    </div>
+    <div class="card">
+      <div style="overflow-x:auto">
+        <table class="admin-table">
+          <thead>
+            <tr><th>Titre</th><th>Paire</th><th>Biais</th><th>Accès</th><th>Date</th><th>Actions</th></tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>EUR/USD — Biais haussier avant NFP</td>
+              <td><strong>EUR/USD</strong></td>
+              <td><span class="bias-tag bias-bullish" style="display:inline-flex">↑ HAUSSIER</span></td>
+              <td><span class="badge badge-gratuit">GRATUIT</span></td>
+              <td>07 avr. 2026</td>
+              <td><button class="btn btn-sm btn-secondary">Éditer</button></td>
+            </tr>
+            <tr>
+              <td>OR — Zone de distribution à surveiller</td>
+              <td><strong>XAU/USD</strong></td>
+              <td><span class="bias-tag bias-bearish" style="display:inline-flex">↓ BAISSIER</span></td>
+              <td><span class="badge badge-premium">PREMIUM</span></td>
+              <td>06 avr. 2026</td>
+              <td><button class="btn btn-sm btn-secondary">Éditer</button></td>
+            </tr>
+            <tr>
+              <td>GBP/USD — Breakout triangle</td>
+              <td><strong>GBP/USD</strong></td>
+              <td><span class="bias-tag bias-neutral" style="display:inline-flex">→ NEUTRE</span></td>
+              <td><span class="badge badge-gratuit">GRATUIT</span></td>
+              <td>05 avr. 2026</td>
+              <td><button class="btn btn-sm btn-secondary">Éditer</button></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- PAGE: Payments -->
+  <div class="admin-page" id="page-payments">
+    <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-bottom:24px">
+      ${[
+        { label:"Aujourd'hui", amount:'128 000 FCFA', count:'6 transactions' },
+        { label:'Cette semaine', amount:'892 000 FCFA', count:'43 transactions' },
+        { label:'Ce mois', amount:'1 840 000 FCFA', count:'187 transactions' },
+      ].map(s => `
+        <div class="card">
+          <div class="card-body">
+            <div style="font-size:11px;font-weight:700;text-transform:uppercase;color:var(--text-muted);margin-bottom:8px">${s.label}</div>
+            <div style="font-size:22px;font-weight:800;color:var(--text-primary);margin-bottom:4px">${s.amount}</div>
+            <div style="font-size:12px;color:var(--text-muted)">${s.count}</div>
+          </div>
+        </div>
+      `).join('')}
+    </div>
+    <div class="card">
+      <div class="card-header">
+        <span style="font-weight:800">Transactions récentes</span>
+        <button class="btn btn-sm btn-secondary" onclick="alert('Export CSV généré')">⬇ Export CSV</button>
+      </div>
+      <div style="overflow-x:auto">
+        <table class="admin-table">
+          <thead>
+            <tr><th>Utilisateur</th><th>Produit</th><th>Montant</th><th>Méthode</th><th>Date</th><th>Statut</th><th>Actions</th></tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>Kofi Mensah</td><td>Formation Forex A→Z</td>
+              <td><strong>30 000 FCFA</strong></td>
+              <td>Wave</td><td>07 avr. 2026</td>
+              <td><span class="badge badge-green">Confirmé</span></td>
+              <td><button class="btn btn-sm btn-ghost">Reçu</button></td>
+            </tr>
+            <tr>
+              <td>Fatou Diallo</td><td>Abonnement Premium</td>
+              <td><strong>7 500 FCFA</strong></td>
+              <td>Flooz</td><td>07 avr. 2026</td>
+              <td><span class="badge badge-green">Confirmé</span></td>
+              <td><button class="btn btn-sm btn-ghost">Reçu</button></td>
+            </tr>
+            <tr>
+              <td>Ibrahim Sanogo</td><td>Session Coaching</td>
+              <td><strong>20 000 FCFA</strong></td>
+              <td>T-Money</td><td>06 avr. 2026</td>
+              <td><span class="badge badge-green">Confirmé</span></td>
+              <td><button class="btn btn-sm btn-ghost">Reçu</button></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- PAGE: Notifications Push -->
+  <div class="admin-page" id="page-notifications-admin">
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:24px">
+      <!-- Compose -->
+      <div class="card">
+        <div class="card-header"><span style="font-weight:800">Envoyer une notification</span></div>
+        <div class="card-body">
+          <div class="form-group">
+            <label class="form-label">Destinataires</label>
+            <select class="form-control">
+              <option>Tous les utilisateurs (2 847)</option>
+              <option>Utilisateurs Premium (312)</option>
+              <option>Utilisateurs inactifs 3 jours</option>
+              <option>inscrits cette semaine</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Titre</label>
+            <input type="text" class="form-control" placeholder="Ex: Nouvelle analyse publiée">
+          </div>
+          <div class="form-group">
+            <label class="form-label">Message</label>
+            <textarea class="form-control" rows="3" placeholder="Contenu de la notification…" style="resize:none"></textarea>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Planification</label>
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
+              <input type="date" class="form-control">
+              <input type="time" class="form-control">
+            </div>
+          </div>
+          <button class="btn btn-primary btn-block" onclick="alert('Notification planifiée ! FCM en production.')">
+            Envoyer maintenant
+          </button>
+          <button class="btn btn-secondary btn-block mt-2">
+            Planifier
+          </button>
+        </div>
+      </div>
+
+      <!-- Stats -->
+      <div class="card">
+        <div class="card-header"><span style="font-weight:800">Statistiques push</span></div>
+        <div class="card-body">
+          ${[
+            { label:'Notifications envoyées (mois)', value:'47' },
+            { label:'Taux d\'ouverture moyen', value:'34.2%' },
+            { label:'Utilisateurs abonnés aux push', value:'2 104' },
+            { label:'Dernière notification', value:'Il y a 2h' },
+          ].map(s => `
+            <div style="display:flex;justify-content:space-between;padding:12px 0;border-bottom:1px solid var(--border)">
+              <span style="font-size:13px;color:var(--text-secondary)">${s.label}</span>
+              <strong style="font-size:14px">${s.value}</strong>
+            </div>
+          `).join('')}
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<script src="js/data.js"></script>
+<script>
+  // Dynamic Branding
+  if (window.ET && ET.DATA && ET.DATA.brand) {
+    document.title = `${ET.DATA.brand.name} — Admin`;
+    const logoTitle = document.querySelector('.admin-logo-title');
+    if (logoTitle) {
+      const parts = ET.DATA.brand.name.split(' ');
+      logoTitle.innerHTML = `${parts[0]} <span>${parts.slice(1).join(' ')}</span>`;
+    }
+    const adminLogoSub = document.querySelector('.admin-logo-sub');
+    if (adminLogoSub) adminLogoSub.textContent = `Back-office Admin — ${ET.DATA.brand.name}`;
+    const adminName = document.querySelector('.admin-topbar b'); // placeholder
+    // ...
+  }
+
+  // Navigation
+  function showPage(id) {
+    document.querySelectorAll('.admin-page').forEach(p => p.classList.remove('active'));
+    document.querySelectorAll('.sidebar-link').forEach(l => l.classList.remove('active'));
+    document.getElementById('page-'+id).classList.add('active');
+    event.currentTarget.classList.add('active');
+
+    const titles = {
+      dashboard: ['Tableau de bord','Vue d\'ensemble des activités'],
+      users: ['Utilisateurs','Gestion des comptes'],
+      formations: ['Formations','Gestion du contenu éducatif'],
+      analyses: ['Analyses de marché','Publication et gestion'],
+      payments: ['Paiements','Transactions et revenus'],
+      'notifications-admin': ['Notifications push','Firebase Cloud Messaging']
+    };
+    const t = titles[id] || [id,''];
+    document.getElementById('page-title').textContent = t[0];
+    document.getElementById('page-subtitle').textContent = t[1];
+  }
+
+  // Clock
+  function updateClock() {
+    const now = new Date();
+    document.getElementById('admin-time').textContent = now.toLocaleTimeString('fr-FR', {hour:'2-digit',minute:'2-digit',second:'2-digit'}) + ' · ' + now.toLocaleDateString('fr-FR',{weekday:'long',day:'numeric',month:'long'});
+  }
+  updateClock();
+  setInterval(updateClock, 1000);
+
+  // Revenue Chart
+  const months = ['Jan','Fév','Mar','Avr','Mai','Jun'];
+  const revenues = [820000,1050000,1230000,1840000,0,0];
+  const chart = document.getElementById('revenue-chart');
+  if (chart) {
+    const max = Math.max(...revenues.filter(v=>v>0));
+    chart.innerHTML = months.map((m,i) => {
+      const v = revenues[i];
+      const h = v > 0 ? Math.round((v/max)*180) : 0;
+      const color = v > 0 ? (i === 3 ? '#D4A017' : '#1A4A7A') : '#E2E8F0';
+      return `<div class="chart-bar" style="height:${Math.max(h,4)}px;background:${color};position:relative">
+        ${v>0?`<div style="position:absolute;top:-22px;width:100%;text-align:center;font-size:10px;font-weight:700;color:${i===3?'#D4A017':'var(--text-muted)'}">${Math.round(v/1000)}K</div>`:''}
+        <div class="chart-bar-label">${m}</div>
+      </div>`;
+    }).join('');
+  }
+
+  // Users table
+  const usersData = [
+    { name:'Kofi Mensah', email:'kofi@gmail.com', country:'🇹🇬 Togo', plan:'premium', date:'07 avr.', lastLogin:'Il y a 1h', active:true },
+    { name:'Fatou Diallo', email:'fatou@yahoo.fr', country:'🇸🇳 Sénégal', plan:'essentiel', date:'06 avr.', lastLogin:'Il y a 3h', active:true },
+    { name:'Ibrahim Sanogo', email:'ibrahim@gmail.com', country:'🇨🇮 CI', plan:'elite', date:'05 avr.', lastLogin:'Il y a 5h', active:true },
+    { name:'Aïcha Traoré', email:'aicha@gmail.com', country:'🇧🇯 Bénin', plan:'essentiel', date:'04 avr.', lastLogin:'Il y a 2j', active:true },
+    { name:'Mawuli Koffi', email:'mawuli@yahoo.fr', country:'🇹🇬 Togo', plan:'premium', date:'02 avr.', lastLogin:'Il y a 3j', active:false },
+  ];
+
+  const planBadge = { essentiel:'badge-muted', premium:'badge-premium', elite:'badge-gold' };
+  function genRow(u) {
+    return `<tr>
+      <td><div style="display:flex;align-items:center;gap:10px"><div style="width:32px;height:32px;border-radius:50%;background:linear-gradient(135deg,var(--blue-mid),var(--blue-dark));display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:800;color:#fff">${u.name[0]}</div><strong>${u.name}</strong></div></td>
+      <td style="color:var(--text-muted)">${u.email}</td>
+      <td>${u.country}</td>
+      <td><span class="badge ${planBadge[u.plan]||'badge-muted'}">${u.plan.toUpperCase()}</span></td>
+      <td style="color:var(--text-muted)">${u.date}</td>
+      <td style="color:var(--text-muted)">${u.lastLogin}</td>
+      <td><span class="badge ${u.active?'badge-green':'badge-muted'}">${u.active?'Actif':'Inactif'}</span></td>
+      <td style="text-align:right"><button class="btn btn-sm btn-secondary">Voir</button></td>
+    </tr>`;
+  }
+
+  const recentTbl = document.getElementById('recent-users-table');
+  const allTbl = document.getElementById('all-users-table');
+  if (recentTbl) recentTbl.innerHTML = usersData.slice(0,3).map(genRow).join('');
+  if (allTbl) allTbl.innerHTML = usersData.map(genRow).join('');
+</script>
+
+</body>
+</html>
